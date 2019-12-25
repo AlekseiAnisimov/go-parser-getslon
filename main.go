@@ -1,9 +1,9 @@
-// parser project main.go
+// parser project xmlparser.go
 package main
 
 import (
 	"archive/zip"
-	"parser/mail"
+	"./mail"
 	"path"
 
 	//"encoding/xml"
@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"./xmlparser"
 )
 
 func main() {
@@ -29,7 +30,12 @@ func main() {
 		fmt.Println(err)
 	}
 
-	Unzip(pathFile, xmlFilePath)
+	lastfile, _ := Unzip(pathFile, xmlFilePath)
+
+	xmlparser.SetXmlFile(lastfile)
+	xmlparser.ReadXmlData()
+
+	fmt.Println("Stop! in: ", time.Now())
 }
 
 func DownloadFile() (filePath string, err error) {
@@ -83,19 +89,13 @@ func DeleteXmlFiles() error {
 	return nil
 }
 
-func Unzip(filepathZip string, dst string) error{
+func Unzip(filepathZip string, dst string) (f string, err error) {
+	var fpath string
 	r, err := zip.OpenReader(filepathZip)
-	 
-	if err != nil {
-		return err
-	}
+
 
 	for _, f := range r.File {
 		rc, err := f.Open()
-		
-		if err != nil {
-			return err
-		}
 		
 		defer func() {
 			if rc.Close(); err != nil {
@@ -103,7 +103,7 @@ func Unzip(filepathZip string, dst string) error{
 			}
 		}()
 		
-		fpath := filepath.Join(dst, f.Name)
+		fpath = filepath.Join(dst, f.Name)
 		
 		if f.FileInfo().IsDir() {
 			os.Mkdir(fpath, f.Mode())
@@ -116,22 +116,18 @@ func Unzip(filepathZip string, dst string) error{
 			}
 
 			err = os.MkdirAll(fdir, f.Mode())
-			if err != nil {
-				return err
-			}
+
 
 			f, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
-				return err
+				panic(err)
 			}
 			defer f.Close()
 
 			_, err = io.Copy(f, rc)
-			if err != nil {
-				return err
-			}
+
 		}
 	}
 
-	return nil
+	return fpath, err;
 }
