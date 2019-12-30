@@ -1,18 +1,22 @@
-package xmlparser;
+package xmlparser
 
 import (
     "encoding/xml"
     "fmt"
     "io/ioutil"
-    "strings"
 )
 
 var xmlfile string
 
 var xmlblob string
 
+type Xml struct {
+
+}
+
 type Categories struct {
-    Category string
+    XMLName xml.Name    `xml:"categories"`
+    Category []string   `xml:"category"`
 }
 
 func SetXmlFile(path string) {
@@ -21,29 +25,16 @@ func SetXmlFile(path string) {
 
 func ReadXmlData() error {
     openfile, err := ioutil.ReadFile(xmlfile)
-
     if err != nil {
     	return err;
     }
 
-    err = Categories.UnmarshalXML(openfile)
+    var v Categories
+    err = xml.Unmarshal([]byte(openfile), &v)
 
     if err != nil {
-        return err;
+        fmt.Println(err)
     }
-
-    return nil
-}
-
-func (Categories) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-    var s string
-    if err := d.DecodeElement(&s, &start); err != nil {
-        return err
-    }
-
-    if strings.ToLower(s) == "categories" {
-
-        fmt.Println(s)
-    }
-    return nil
+    fmt.Println(v.Category)
+    return err
 }
