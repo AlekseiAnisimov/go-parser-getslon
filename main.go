@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 	"./xmlparser"
+	"./dbsave"
 )
 
 func main() {
@@ -31,9 +32,11 @@ func main() {
 	}
 
 	lastfile, _ := Unzip(pathFile, xmlFilePath)
-
+	var cc xmlparser.Categories
 	xmlparser.SetXmlFile(lastfile)
-	xmlparser.ReadXmlData()
+	xmlparser.ReadXmlData(&cc)
+	//fmt.Println(cc)
+	dbsave.SaveCategories(&cc)
 
 	fmt.Println("Stop! in: ", time.Now())
 }
