@@ -3,38 +3,37 @@ package dbsave
 import (
 	"github.com/go-ozzo/ozzo-dbx"
 	//"github.com/denisenkom/go-mssqldb"
-	"../xmlparser"
+	_ "github.com/go-sql-driver/mysql"
+	"parser/xmlparser"
 	"reflect"
-	"fmt"
 )
 
 var db dbx.DB
 
 func Connection() *dbx.DB {
-	db, _ := dbx.Open("go-mssqldb","u0305394_alexeyms:j3j7dM0~@/31.31.196.80/instance?database=u0305394_shmotki")
-
+	db, _ := dbx.Open("mysql", "root2:123@/shmotki")
 	return db
 }
 
-func SaveCategories(category *xmlparser.Categories)  {
-	v := reflect.ValueOf(category)
-	//values := make([]interface{}, v.NumField())
-	fmt.Println(v.NumField())
-	for i := 0; i < v.NumField(); i++ {
-		/*var categoriesTmp xmlparser.Categories
-		err := db.Builder.Select("*").From("categories").Where(dbx.HashExp{"id": category.Id}).One(&categoriesTmp)
+func SaveCategories(categories *xmlparser.Categories) error {
+	v := reflect.ValueOf(categories.Category)
+	for i := 0; i < v.Len(); i++ {
+		id := v.Index(i).FieldByName("Id").Int()
+		parentId := v.Index(i).FieldByName("ParentId").Int()
+		value := v.Index(i).FieldByName("Value").String()
 
-		if err != nil {
-			return err
-		}
+		var categoryTmp = new(xmlparser.Category)
+		db := Connection()
+		_ = db.Builder.Select("id", "parent_id", "description").From("categories").Where(dbx.HashExp{"id": id}).One(&categoryTmp)
 
-		if category == nil {
+		if categoryTmp.Id == 0 {
 			db.Builder.Insert("categories", dbx.Params{
-				"id":          category.Id,
-				"parent_id":   category.ParentId,
-				"description": category.Value,
+				"id":          id,
+				"parent_id":   parentId,
+				"description": value,
 			}).Execute()
-		}*/
-		fmt.Println(v.Field(i).Interface())
+		}
 	}
+
+	return nil
 }

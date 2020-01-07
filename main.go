@@ -3,20 +3,19 @@ package main
 
 import (
 	"archive/zip"
-	"./mail"
+	"parser/mail"
 	"path"
 
-	//"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"parser/dbsave"
+	"parser/xmlparser"
 	"path/filepath"
 	"strings"
 	"time"
-	"./xmlparser"
-	"./dbsave"
 )
 
 func main() {
@@ -35,7 +34,7 @@ func main() {
 	var cc xmlparser.Categories
 	xmlparser.SetXmlFile(lastfile)
 	xmlparser.ReadXmlData(&cc)
-	//fmt.Println(cc)
+
 	dbsave.SaveCategories(&cc)
 
 	fmt.Println("Stop! in: ", time.Now())
@@ -49,7 +48,7 @@ func DownloadFile() (filePath string, err error) {
 	url = remoteURL
 
 	resp, err := http.Get(url)
-	
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -58,10 +57,10 @@ func DownloadFile() (filePath string, err error) {
 	}
 
 	fullFilePath := path.Join(filepath, "file.zip")
-	out, err :=  os.Create(fullFilePath)
-	
+	out, err := os.Create(fullFilePath)
+
 	defer out.Close()
-	
+
 	_, err = io.Copy(out, resp.Body)
 
 	return fullFilePath, nil
@@ -82,7 +81,7 @@ func DeleteXmlFiles() error {
 
 		if fileExt == ".xml" {
 			err := os.Remove(file.Name())
-			
+
 			if err != nil {
 				return err
 			}
@@ -96,18 +95,17 @@ func Unzip(filepathZip string, dst string) (f string, err error) {
 	var fpath string
 	r, err := zip.OpenReader(filepathZip)
 
-
 	for _, f := range r.File {
 		rc, err := f.Open()
-		
+
 		defer func() {
 			if rc.Close(); err != nil {
 				panic(err)
 			}
 		}()
-		
+
 		fpath = filepath.Join(dst, f.Name)
-		
+
 		if f.FileInfo().IsDir() {
 			os.Mkdir(fpath, f.Mode())
 		} else {
@@ -120,7 +118,6 @@ func Unzip(filepathZip string, dst string) (f string, err error) {
 
 			err = os.MkdirAll(fdir, f.Mode())
 
-
 			f, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
 				panic(err)
@@ -132,5 +129,5 @@ func Unzip(filepathZip string, dst string) (f string, err error) {
 		}
 	}
 
-	return fpath, err;
+	return fpath, err
 }
