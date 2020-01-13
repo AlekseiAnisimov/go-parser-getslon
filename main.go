@@ -3,7 +3,7 @@ package main
 
 import (
 	"archive/zip"
-	"parser/mail"
+	"./mail"
 	"path"
 
 	"fmt"
@@ -11,8 +11,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"parser/dbsave"
-	"parser/xmlparser"
+	"./dbsave"
+	"./xmlparser"
 	"path/filepath"
 	"strings"
 	"time"
@@ -32,11 +32,12 @@ func main() {
 
 	lastfile, _ := Unzip(pathFile, xmlFilePath)
 	var cc xmlparser.Categories
+	var products xmlparser.Products
 	xmlparser.SetXmlFile(lastfile)
-	xmlparser.ReadXmlData(&cc)
+	xmlparser.ReadXmlData(&cc, &products)
 
 	dbsave.SaveCategories(&cc)
-
+	fmt.Println(products)
 	fmt.Println("Stop! in: ", time.Now())
 }
 
