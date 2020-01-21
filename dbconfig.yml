@@ -1,4 +1,4 @@
 development:
   dialect: mysql
-  datasource: root:123@tcp(localhost:3306)/shmotki?parseTime=true
+  datasource: root2:123@tcp(localhost:3306)/shmotki?parseTime=true
   dir: migrations

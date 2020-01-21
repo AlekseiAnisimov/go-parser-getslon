@@ -3,17 +3,19 @@ package dbsave
 import (
 	"github.com/go-ozzo/ozzo-dbx"
 	//"github.com/denisenkom/go-mssqldb"
-	_ "github.com/go-sql-driver/mysql"
-	"../xmlparser"
+	//	"fmt"
 	"reflect"
-	"strings"
-	"fmt"
+	//	"strings"
+
+	"parser/xmlparser"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var db dbx.DB
 
 func Connection() *dbx.DB {
-	db, _ := dbx.Open("mysql", "root:123@/shmotki")
+	db, _ := dbx.Open("mysql", "root2:123@/shmotki")
 	return db
 }
 
@@ -45,17 +47,15 @@ func SaveCategories(categories *xmlparser.Categories) error {
 	return nil
 }
 
-func SaveProducts(products *xmlparser.Products) {
-	v := reflect.ValueOf(products.Product)
+func SaveProducts(products *xmlparser.Products) error {
+	//v := reflect.ValueOf(products.Product)
 	db := Connection()
-	var sb strings.Builder
+	/*var sb strings.Builder
 	rowCnt := 0
-
 
 	for i := 0; i < v.Len(); i++ {
 		batchRow := ""
 		rowCnt++
-
 
 		productId := v.Index(i).FieldByName("ParentId").String()
 		article := v.Index(i).FieldByName("Article").String()
@@ -73,16 +73,19 @@ func SaveProducts(products *xmlparser.Products) {
 		oldprice := v.Index(i).FieldByName("Oldprice").Float()
 		url := v.Index(i).FieldByName("Url").String()
 		destinationUrl := v.Index(i).FieldByName("DestinationUrl").String()
-		currencyId	:= v.Index(i).FieldByName("CurrencyId").String()
+		currencyId := v.Index(i).FieldByName("CurrencyId").String()
 		price := v.Index(i).FieldByName("Price").Float()
 		age := v.Index(i).FieldByName("Age").String()
 		composition := v.Index(i).FieldByName("Composition").String()
 		otherPictures := v.Index(i).FieldByName("OtherPictures").String()
 
-		batchRow := fmt.Sprintf("(%s, %s, %s, %s, %s, %d, %s, %d, %s, %s, %s, %s, %s, %v, %s, %s, %s, %v, %s, %s, %s)", )
+		batchRow := fmt.Sprintf("(%s, %s, %s, %s, %s, %d, %s, %d, %s, %s, %s, %s, %s, %v, %s, %s, %s, %v, %s, %s, %s)", productId, article, name, description, available, merchantId, gsProductKey, gsCategoryId, picture, thumbnail, originalPicture, vendor, model, oldprice, url, destionationUrl, currencyId, price, age, composition, orherPictures)
 
-		if(rowCnt > 100) {
-			_ db.NewQuery("INSERT INTO ")
+		if rowCnt > 100 {
+			_ = db.NewQuery("INSERT INTO products ")
 		}
-	}
+	}*/
+
+	err := db.Model(&products).Insert()
+	return err
 }

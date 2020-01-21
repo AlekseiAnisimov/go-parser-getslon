@@ -3,19 +3,21 @@ package main
 
 import (
 	"archive/zip"
-	"./mail"
 	"path"
+
+	"parser/mail"
 
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"./dbsave"
-	"./xmlparser"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"parser/dbsave"
+	"parser/xmlparser"
 )
 
 func main() {
@@ -37,6 +39,7 @@ func main() {
 	xmlparser.ReadXmlData(&cc, &products)
 
 	dbsave.SaveCategories(&cc)
+	dbsave.SaveProducts(&products)
 	fmt.Println(products)
 	fmt.Println("Stop! in: ", time.Now())
 }
